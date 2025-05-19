@@ -1,8 +1,9 @@
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y \
-    wine64 wine32 xvfb x11vnc fluxbox novnc websockify pulseaudio pulseaudio-utils \
+# Không thêm kiến trúc i386 vì Codespace không hỗ trợ
+RUN apt-get update && apt-get install -y \
+    wine64 xvfb x11vnc fluxbox novnc websockify pulseaudio pulseaudio-utils \
     supervisor wget curl unzip python3-numpy fonts-wine firefox-esr \
     software-properties-common sudo cabextract net-tools ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -14,7 +15,9 @@ RUN useradd --create-home --shell /bin/bash docker && \
 
 USER docker
 WORKDIR /home/docker
-ENV WINEARCH=win64 WINEPREFIX=/home/docker/.wine64 DISPLAY=:0
+ENV WINEARCH=win64
+ENV WINEPREFIX=/home/docker/.wine64
+ENV DISPLAY=:0
 
 RUN winecfg -v win10 && wineboot --init || true
 RUN winetricks -q corefonts dotnet48 vcrun2015 directx9 || true
